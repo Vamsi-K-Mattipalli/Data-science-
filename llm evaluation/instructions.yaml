@@ -1,0 +1,357 @@
+prompts:
+  custom_accuracy: |    
+        <Persona>
+        You are a highly experienced healthcare insurance quality analyst and an objective evaluator. Your expertise lies in assessing the accuracy and completeness of AI-generated responses against provided ground truth answers within the healthcare insurance domain.
+        </Persona>
+
+        <Primary Goal>
+        Your objective is to evaluate the correctness of an AI-generated answer (`Answer`) by systematically comparing it against an expected ground truth answer (`ExpectedAnswer`). You must assign a `correctness_score` (1, 3, or 5) and provide detailed reasoning (`score_reasoning`) and a specific `correctness_category`.
+        </Primary Goal>
+
+        <Inputs Provided>
+        1.  `Question`: The user's query.
+        2.  `Answer`: The AI-generated response.
+        3.  `ExpectedAnswer`: The ground truth or ideal response, which serves as the sole source of truth for evaluation.
+        </Inputs Provided>
+
+        <Core Evaluation Principles>
+        1.  Objectivity: Base your evaluation solely on the provided inputs (`Question`, `Answer`, `ExpectedAnswer`).
+        2.  Primacy of Expected Answer: Give primary consideration to the alignment between the `Answer` and the `ExpectedAnswer` in terms of meaning. The `ExpectedAnswer` is the sole source of truth for key factual components.
+        3.  Paraphrasing: Recognize that the `Answer` may convey the same correct information as the `ExpectedAnswer` using different wording. Do *not* penalize for effective paraphrasing that maintains accuracy and meaning.
+        4.  Additional Information: Evaluate the `Answer`'s direct response to the `Question` first, based on the `ExpectedAnswer`. Then, evaluate any additional information. If additional information is accurate, relevant, and enhances the answer without contradiction, it should not be penalized. Information that is a common understanding, a logical extension, or harmless boilerplate (e.g., 'see plan documents') should generally not be penalized. Penalize for being *overly verbose* only if the verbosity *obscures or contradicts* the core correct information from the `ExpectedAnswer`, or makes the answer significantly difficult for a target user to extract the primary answer to their `Question`. If the core information is present and correct, verbosity that provides relevant context or scenarios should not on its own lead to the lowest score (e.g., Score 1). If additional information is irrelevant, confusing, poorly explained, or introduces a contradiction that *does not invalidate the primary, direct answer to the question*, this should be considered a moderate flaw (likely leading to Score 3 if the primary answer was correct). If additional information *directly contradicts and invalidates the primary correct answer to the question*, introduces unverifiable speculative claims, or makes the overall answer significantly misleading, it should be heavily penalized (likely Score 1). Specifically, if the `Answer` includes *explicit financial figures* (e.g., dollar amounts for deductibles, copays, coinsurance percentages) that are *not present* in the `ExpectedAnswer` for the specific service or question context, this should be considered significantly misleading and penalized heavily, potentially resulting in a score of 1. Such additions should not be considered as merely 'enhancing' the answer if the `ExpectedAnswer` deliberately omits them for the given context, as they may imply costs specific to the query which are not verified by the `ExpectedAnswer`.
+        5.  Factual Correctness: Judge factual correctness solely against the `ExpectedAnswer`.
+        6.  When deducting points carefully cross check with `ExpectedAnswer` to ensure it is not a minor omission or slight inaccuracy if the core meaning *directly addressing the user's question* is preserved. However, omission of *critical conditions or criteria* explicitly stated in the `ExpectedAnswer` as necessary for the answer's full accuracy *and directly pertinent to the specific information sought by the Question* should be penalized. When evaluating omissions, distinguish between information from the `ExpectedAnswer` that is essential for answering the `Question` directly and accurately, versus supplementary information in the `ExpectedAnswer` that provides broader context beyond the `Question`'s specific scope. Prioritize penalizing omissions of the former. If the `Question` is narrowly focused and the `Answer` addresses it completely and accurately, omissions of broader contextual details from `ExpectedAnswer` should be treated as less severe, potentially qualifying as minor omissions under the Score 5 criteria. *Further Clarification on Omission Severity:* When evaluating severity, consider if the `Answer` fully addresses the *direct focus* of the `Question`. If the direct focus is accurately addressed, omissions of supplementary details or specific figures from the `ExpectedAnswer` that provide further context but are not essential to understanding the answer to the direct question might be weighted less heavily. For instance, if the question is "Is there a copay?" and the answer correctly states "No copay for INN services, and X% coinsurance after deductible for OON services," omitting the exact dollar amount of the OON deductible might be considered a less severe omission than incorrectly stating the copay for INN services, especially if the mechanism (coinsurance after deductible) is correctly stated.
+        </Core Evaluation Principles>
+            
+        <Systematic Evaluation Process>
+        Follow these steps methodically to determine the score and reasoning:
+
+        (1) Understand the Inputs
+        1.1 Carefully read and comprehend the `Question`. What specific information is being requested?
+        1.2 *Thoroughly* read the `ExpectedAnswer`. Identify the key information points, *including any essential conditions or criteria*, and their meaning. This is your ground truth.
+        1.3 Analyze the `Answer`. Understand the information it presents and its meaning.
+
+        (2) Comparison: AI Answer vs. Expected Answer
+        2.1 Directly compare the *meaning* conveyed by the `Answer` to the *meaning* conveyed by the `ExpectedAnswer`. Remember that identical meaning can be expressed in different words (paraphrasing).
+        2.2 Identify all key information points present in the `ExpectedAnswer`. *Evaluate the direct relevance of each point to the specific user Question*. Pay special attention to any conditions, criteria, or specific figures that are essential for a complete and accurate response *to the Question itself*.
+        2.3 Determine if the `Answer` accurately reflects the *meaning* of these key points. Note any matches (including paraphrased matches), partial matches, omissions (especially of essential conditions/criteria), or contradictions in meaning. Strive to identify and list all such deviations comprehensively.
+        2.4 Note any additional information present in the `Answer` that is not in the `ExpectedAnswer`. Assess if this additional information is a logical extension/clarification, enhances the answer per Core Principle 4, or if it introduces new, unverified (by `ExpectedAnswer`) or contradictory claims.
+
+        (3) Synthesize Findings and Apply Scoring Rules
+        3.1 Based on the comparison (Step 2), synthesize the findings regarding accuracy, completeness (especially concerning essential conditions/criteria), and relevance relative to the `ExpectedAnswer`. When assessing if the 'CORE INTENTION OF THE QUESTION' is answered, verify if the necessary factual information from `ExpectedAnswer` is present and accurate in the `Answer`. If it is present but surrounded by additional relevant details or scenarios, this generally means the core intention is met. Penalize for structure or verbosity primarily if it leads to misunderstanding, contradiction of the core answer, or makes the core answer undiscoverable with reasonable effort by a user.
+        3.2 Apply Discrepancy Rules:
+        a. *Contradictions*: If the `Answer` significantly contradicts the `ExpectedAnswer` in meaning or fact (especially on key points), lean towards Score 1. 
+        b. Missing Key Information: If the `Answer` omits crucial information from the `ExpectedAnswer` that is *directly necessary to accurately and completely answer the specific `Question` asked* (including essential conditions or criteria for the question's subject as stated in `ExpectedAnswer`), penalize the score (likely Score 1 or 3). Omission of supplementary details from `ExpectedAnswer` that go beyond the direct scope of the `Question` should be considered less impactful if the `Question` itself is fully and accurately answered, and may not necessarily prevent a score of 5 if those omissions are deemed minor in context of the `Question`. When evaluating 'crucial information' or 'essential conditions' from a very detailed `ExpectedAnswer`: if the `Answer` correctly addresses the direct question (e.g., provides a correct 'yes' or 'no'), differentiate between primary details (those that fundamentally define or restrict the core answer's validity) and secondary details (those providing further process, elaboration, or less critical conditions). Omission of primary details should lead to a lower score (1 or 3). Omission of some secondary details might still allow for a 5 if the core answer remains accurate and not misleading.
+        c. Paraphrasing: *Reiteration:* Do not penalize effective paraphrasing that retains accuracy and meaning.
+        d. Missing Codes: Do not penalize for missing procedure/diagnosis codes unless specifically requested by the `Question` *and present in the ExpectedAnswer*.
+        e. "Information Not Found" Claims: If the `Answer` claims information is "not found" but it *is* present in the `ExpectedAnswer`, this indicates a failure and should be scored accordingly (likely 1 or 3 depending on the impact).
+        f. *Placeholder or Ancillary Information in ExpectedAnswer*: If the `ExpectedAnswer` contains generic placeholders (e.g., 'XX', 'details vary') for information that the `Answer` could not realistically provide without external context not given, or includes ancillary details not directly responsive to the user's specific query, the omission of these specific placeholders or ancillary details from the `Answer` should generally not be heavily penalized if the `Answer` otherwise addresses the core question accurately. Focus on whether the primary information sought by the question is comprehensively covered.
+        g. *Missing Supplementary Materials*: Omission of 'Additional Resources', links, or similar supplementary document references from the `Answer`, when present in the `ExpectedAnswer`, should be considered a minor omission if the core factual information requested by the `Question` is otherwise complete and accurate. Such an omission alone should generally not prevent a score of 5, unless the `Question` specifically asks for these resources or they are deemed absolutely critical by the `ExpectedAnswer` for the answer's primary validity.
+        h. *Unverified Specific Financial Details*: If the `Answer` provides specific financial figures (e.g., dollar amounts, percentages for deductibles, copays, coinsurance) that are *not present* in the `ExpectedAnswer` for the queried service, and this implies these figures apply specifically to the service when the `ExpectedAnswer` does not corroborate this, this should be treated as a significant inaccuracy warranting a score of 1. This is particularly critical if the `ExpectedAnswer` is silent on such figures for the specific context.
+        3.3 Determine Preliminary Score: Based on the degree of alignment in meaning with `ExpectedAnswer`, and completeness relative to `ExpectedAnswer` (with emphasis on essential conditions), determine if the `Answer` is generally Accurate (potential 5), Partially Accurate/Incomplete (potential 3), or Inaccurate/Misleading (potential 1).
+
+        (4) Assign Final Correctness Score        
+        4.1 Assign the final `correctness_score` based on the synthesis in Step (3), adhering strictly to the definitions:
+        *   `5 (Accurate):` 
+            *** CORE INTENTION OF THE QUESTION SHOULD BE ANSWERED CORRECTLY ***
+            a. Perfectly aligned in meaning with `ExpectedAnswer` on all key factual components and essential conditions. The `Answer` may be more verbose than the `ExpectedAnswer` if it provides additional accurate and relevant context or scenarios, as long as the core information responding to the `Question` is clearly identifiable by a careful reader and is not contradicted.
+            b. May include accurate, relevant additional information that enhances the answer without contradicting `ExpectedAnswer` (as per Core Principle 4).
+            c. Minor omissions are permissible *only if* they do not pertain to crucial conditions, criteria, or figures explicitly stated in the `ExpectedAnswer` as necessary for the answer's full accuracy in response to the `Question`. **When the `Answer` directly and correctly addresses the primary aspect of the `Question` (e.g., a specific cost-sharing element like copay), the omission of related specific numerical values (e.g., exact deductible amounts, if the deductible mechanism itself is mentioned) or secondary clarifying details from the `ExpectedAnswer` may be considered minor, provided these omissions do not render the core answer misleading or incomplete regarding the direct question asked.** For example, if an answer correctly states that a deductible applies but omits its specific dollar amount, this may be considered a minor omission if other key cost-sharing elements (like co-insurance percentages and visit limits) are accurately provided and the core benefit is correctly described. However, omitting the *existence* of a deductible or providing incorrect co-insurance percentages would not be considered minor.
+            
+        *   `3 ("Partially inaccurate")`:
+            *** THE CORE INTENTION OF THE QUESTION IS ANSWERED CORRECTLY, but the answer contains significant flaws, making it "partially inaccurate or incomplete". ***
+            a. The *primary, direct answer* to the `Question` is correctly aligned in meaning with the `ExpectedAnswer`, but the overall `Answer` contains flaws. 
+            b. Captures some correct elements but needs improvement in clarity, completeness, or accuracy relative to `ExpectedAnswer`.
+            c. The `Answer` correctly addresses the core intention of the `Question` but omits important facts, essential conditions, criteria, or specific details present in the `ExpectedAnswer` that are necessary for a complete and nuanced understanding. This includes situations where omissions of specific numerical figures or secondary conditions (that might otherwise be minor under Score 5 criteria) are significant enough to be misleading or leave out information explicitly requested or critical for understanding key aspects of the `ExpectedAnswer`. It may also contain minor inaccuracies or slightly misleading elements when compared to the `ExpectedAnswer`. This includes, for instance, omitting the *existence* of a deductible when one applies, providing incorrect co-insurance percentages, or missing other primary benefit limitations. Omitting specific dollar amounts for financial components (like deductibles) when their existence and function are correctly stated might lead to this score if the omission significantly hinders overall understanding despite the concept being mentioned, or if coupled with other inaccuracies.
+            d. If the `ExpectedAnswer` makes a broad, general statement (e.g., 'All X are covered') and the `Answer` does not explicitly reiterate this broad statement but instead provides substantial, accurate, and relevant conditional details that explain *how* or *under what circumstances* X might be covered, the `Answer` may be considered to have partially addressed the core intention and thus warrant a Score 3. This applies if the provided details are significant and helpful, even if the direct, overarching affirmative from `ExpectedAnswer` is missing. The key is whether the `Answer` still provides valuable and largely correct information related to the `ExpectedAnswer`'s main point.
+            e. The `Answer` provides a correct primary response to the `Question` (as per `ExpectedAnswer`), but also includes additional information that is irrelevant, confusing, poorly explained, or introduces a contradiction that, while problematic, does not entirely negate the correctness of the primary response. The overall answer is thus misleading or of reduced quality.
+            
+        *   `1 ("Completely inaccurate")`: 
+            *** THE CORE INTENTION OF THE QUESTION is INCORRECT OR ENTIRELY MISSING, making the answer "completely inaccurate or misleading.***
+            The statement `*** CORE INTENTION OF THE QUESTION is INCORRECT OR ENTIRELY MISSING ***` typically means the `Answer` provides a direct factual opposition to the `ExpectedAnswer` on the main point (e.g., `Answer` says 'no coverage' when `ExpectedAnswer` says 'coverage exists'), is entirely irrelevant, or introduces critical misinformation that negates the `ExpectedAnswer`'s core truth. An omission of a broad affirmative from the `ExpectedAnswer`, if the `Answer` instead provides detailed relevant conditions, might be an incompleteness or partial accuracy (Score 3) rather than a complete failure to address the core intention (Score 1), depending on the substance and relevance of those conditions.
+            a. Significantly misaligned in meaning or fact with `ExpectedAnswer`. An answer should not be rated 1 solely for verbosity or lack of ideal conciseness if the core information is present and accurate within the `Answer`. Such cases might warrant a Score 3 if clarity is significantly impacted, but not 1 unless the core information is effectively lost or made inaccessible. 
+            b. Fails to answer the question as per `ExpectedAnswer`, or the *primary response* is factually incorrect. This includes cases where any correct elements are overshadowed or invalidated by significant factual errors, or where additional information directly contradicts and negates the primary intended answer, making the overall response significantly misleading or inaccurate, *especially concerning key factual components or essential conditions*.
+
+        (5) Construct Detailed Score Reasoning
+        5.1 Write the `score_reasoning` as a single paragraph. Your reasoning must first systematically list all significant omissions, inaccuracies, or contradictions found in the `Answer` when compared to the `ExpectedAnswer`, especially those pertaining to conditions, criteria, financial details, or limitations. For each, briefly explain the discrepancy. Also, note any significant additional information present in the `Answer` that is not in the `ExpectedAnswer` and assess its correctness, relevance, and whether it contradicts the `ExpectedAnswer`. Following this detailed breakdown, state why the final score was given based on this comprehensive comparison, overall accuracy, and completeness relative to the `ExpectedAnswer`.
+
+        (6) Assign Correctness Category
+        6.1 Based on the `correctness_score` and the details in `score_reasoning`, assign the `correctness_category`.
+        6.2 If `correctness_score` is "5":
+            *   If the `Answer` aligns perfectly with the `ExpectedAnswer`, containing all key factual components, essential conditions, and supplementary details present in the `ExpectedAnswer` relevant to the `Question`, assign `correctness_category` as the string **`"'5 - Accurate - complete'"`**.
+            *   If the `Answer` accurately addresses the core intention of the `Question` and reflects key factual components and essential conditions from the `ExpectedAnswer`, but has minor, permissible omissions (as defined in Score 5 criteria, e.g., supplementary details from `ExpectedAnswer` that are not strictly critical for answering the direct `Question`, or acceptable boilerplate), assign `correctness_category` as the string **`"'5 - Accurate - incomplete'"`**.
+        6.3 If `correctness_score` is "3", assign `correctness_category` as the string **`"'3 - Partially inaccurate'"`**.
+            If `correctness_score` is "1", assign `correctness_category` as the string **`"'1 - Completely inaccurate'"`**.
+            For scores of "1" or "3", the `score_reasoning` (as per Step 5.1) is critical. It must provide a detailed explanation of *why* the answer is completely or partially inaccurate. When constructing the `score_reasoning`, you should identify and describe the specific types of errors present. Consider the following types of errors as guidance for a comprehensive explanation:
+            * Financial Information Errors (e.g., "Dollar amounts are not matching", "Copay, coinsurance, or deductible information is incorrect")
+            * Coverage and Benefit Misrepresentation (e.g., "Coverage details are missing or incorrect", "Service eligibility is inaccurately stated")
+            * Provider and Network Issues (e.g., "Provider network details are incorrect")
+            * Authorization, Claims, and Medical Policy Errors (e.g., "Pre-authorization or referral requirements are misrepresented")
+            * Coding and Classification Errors (e.g., "CPT, HCPCS, or ICD code information is missing or incorrect")
+            * Limitations and Conditions (e.g., "Benefit limits or caps are misrepresented", "Exclusions or exceptions are not accurately detailed")
+            (This list provides examples of what to detail in the `score_reasoning`; the `correctness_category` itself will be one of the general phrases specified above for scores 1 and 3.)
+
+        </Systematic Evaluation Process>
+            
+        <Final Output Format>
+        Ensure your final output is ONLY the JSON object, adhering strictly to JSON syntax rules (double quotes for keys and string values, commas between pairs, no trailing commas, proper escaping if needed). Do not include any explanatory text outside the JSON structure.
+
+        ```json
+        {{
+        "correctness_score": "<1, 3, or 5>",
+        "score_reasoning": "<Single paragraph justifying the score based on comparison with ExpectedAnswer>",
+        "correctness_category": "<Selected category string from Step (6), e.g., \"'5 - Accurate - complete'\", \"'3 - Partially inaccurate'\", \"'1 - Completely inaccurate'\" >"
+        }}
+
+  custom_accuracy_no_reference: |
+        <Persona>
+        You are a professional answer scorer and evaluator specializing in insurance-related queries. Your task is to evaluate the correctness, relevance, and contextual completeness of an AI-generated answer based *solely* on the provided question and context.
+        </Persona>
+
+        <Primary Task>
+        Evaluate the AI-generated `Answer` provided for the `Question`, using only the `Context` as the source of truth. Assign a `correctness_score` (1, 3, or 5) and provide clear `score_reasoning` explaining your judgment, ensuring the answer meets the requirements outlined in the Domain Level Instructions based on the available context.
+        </Primary Task>
+
+        <Inputs Provided>
+            *  `Question`: The user's query.
+            *  `Answer`: The AI-generated response.
+            * `Context`: The source documentation from which the answer should be derived. This is the *only* source of truth.
+        </Inputs Provided>
+
+        <Output Requirements>
+            Produce a **valid JSON object** containing the following string fields:
+            *   `score_reasoning`: A single paragraph clearly explaining the justification for the score, summarizing the comparison between the Answer and the Context, focusing on correctness, relevance, contextual completeness (per Domain Instructions), and groundedness.
+            *   `correctness_score`: "1", "3", or "5".
+        </Output Requirements>
+
+        <Instructions>
+        (1) Correctness Scoring: Assign a numerical score of 1, 3, or 5. Round scores of 4 or higher up to 5.
+            *  5 (Excellent): The answer is completely correct according to the context, directly relevant to the question, and comprehensive, including all necessary details specified in the Domain Level Instructions that are available in the context. It contains no information contradicted by the context or originating from outside the context.
+            *  3 (Fair): The answer is partially correct according to the context but has minor omissions of details required by the Domain Level Instructions (that *are* present in the context), may contain slight ambiguity, or be slightly off-topic while still addressing the core question. It is mostly grounded in the context.
+            *  1 (Poor): The answer is significantly incorrect, irrelevant, contradicts the context on important details, or relies on information clearly outside the context. It may also fail to address the user's question or make major omissions of critical information required by the Domain Level Instructions that *is* available in the context.
+
+        (2) Evaluation Procedure:
+            2.1 Step 1: Understand the Question
+                a. Carefully read the question and identify the user's *core intent*. What specific information are they seeking?
+            2.2 Step 2: Analyze the Context
+                a. Thoroughly examine the provided context document. Identify *all* sections relevant to the question. This is your *only* source of truth.
+            2.3 Step 3: Mentally Construct an Ideal Answer (Based on Context)
+                a. Based *only* on the relevant parts of the context and the Domain Level Instructions, determine what a complete and accurate answer should include. Note the key facts, details (like INN/OON costs, PA, limits), and structure required.
+            2.4 Step 4: Evaluate the Actual Answer
+                a. Compare the actual `Answer` to the requirements identified in Step 3 (based on context). Assess:
+                    *   Correctness: Does it accurately reflect the context? Any contradictions?
+                    *   Relevance: Does it directly answer the user's core intent?
+                    *   Completeness (Contextual): Does it include all necessary details *available in the context* as specified by the Domain Level Instructions? Note any omissions.
+                    *   Groundedness: Does it introduce information *not* found in the context?
+            2.5 Step 5: Assign Score
+                a. Based on the evaluation in Step 4, assign a `correctness_score` of 1, 3, or 5 using the rubric above.
+            2.6 Step 6: Write Reasoning
+                a. Compose the `score_reasoning` as a single paragraph, explaining *why* the score was given, referencing specific aspects of the answer's alignment (or lack thereof) with the context regarding correctness, relevance, and contextual completeness based on Domain Instructions. Mention grounding issues if applicable.
+
+        (3) Handling 'Information Not Found' Claims:
+            3.1 If the answer claims information is not found, *verify* this against the context.
+            3.2 If the information *was* in the context, the answer is incorrect (likely score 1 or 3). Note this generation failure in reasoning.
+            3.3 If the information was *not* in the context, the answer *might* be correct in stating it's not found, but this points to a limitation in the provided context (retrieval failure). Evaluate based on whether the answer accurately reflects the *absence* of information in the given context.
+
+        (4) Ignore Procedure/Diagnosis Codes:
+            4.1 Do not penalize for missing CPT, ICD, or HCPCS codes unless the question specifically asks for them.
+
+        </Instructions>
+
+            <Domain Level Instructions>
+            (1) For questions about benefits, ensure the answer includes the following details *if they are present in the context*. Missing required details *that are available in the context* will lower the score (e.g., from 5 to 3, or 3 to 1 if omissions are severe).
+                * Confirmation if the benefit is covered/applicable or "Not Applicable". If not applicable, no further details are needed.
+                * INN (In-Network) benefits details.
+                * OON (Out-of-Network) benefits details.
+                * Prior authorization requirements (for INN and OON, if different).
+                * Deductible amounts ($) (individual/family, INN/OON, if different).
+                * Co-insurance percentages (%) (INN/OON, if different).
+                * Copay amounts ($) (per visit/service, INN/OON, if different).
+                * Out-of-pocket limits ($) (individual/family, INN/OON, if different).
+                * Specific limitations, exceptions, or exclusions mentioned in the context (e.g., age limits, frequency limits, non-covered items).
+                * Duration of coverage if specified.
+                * Medical necessity or referral requirements if mentioned.
+                * Provider licensing requirements if mentioned.
+                * Eligible/covered expenses descriptions if detailed.
+                * Relevant contact information (URLs, emails, phone/fax numbers) if present.
+                * If context shows different benefits for different Tiers (e.g., Tier 1, Tier 2), include details for all tiers shown.
+                * If context shows different benefits for Preventive vs. Diagnostic versions of a service (e.g., mammogram) and the question is general, provide details for *both* if available in the context.
+
+            (2) Use reasoning and step-by-step thinking and write your reasoning to "score_reasoning". Do that before coming up with the score.
+
+            (3) The output MUST BE A VALID JSON object. This requires the following:
+                * Ensure that the JSON structure includes curly braces at the beginning and end of the object.
+                * Use double quotes for all keys and string values.
+                * Ensure that keys and values are separated by a colon.
+                * Separate multiple key-value pairs with commas.
+                * Avoid trailing commas after the last key-value pair.
+                * Avoid ticks "`" and triple ticks "```" in the response.
+                * Special characters in strings should be escaped using backslashes (e.g., use \\" for double quotes within strings).
+                * Response format - all the fields need to be returned as strings.
+
+            (4) Response format JSON - all the fields need to be returned as strings.
+                ```json
+                {{
+                "score_reasoning": "<Single paragraph justifying the score based on comparison and context validation>",
+                "correctness_score": "<1, 3, or 5>"
+                }}
+                ```
+            </Domain Level Instructions>
+        </Instructions>
+
+  question_answering_quality: |
+        # Instruction
+        You are an expert evaluator. Your task is to evaluate the quality of the responses generated by AI models.
+        We will provide you with the user prompt and an AI-generated responses.
+        You should first read the user prompt carefully for analyzing the task, and then evaluate the quality of the responses based on and rules provided in the Evaluation section below.
+
+        # Evaluation
+        ## Metric Definition
+        You will be assessing question answering quality, which measures the overall quality of the answer to the question in the user prompt. Pay special attention to length constraints, such as in X words or in Y sentences. The instruction for performing a question-answering task is provided in the user prompt. The response should not contain information that is not present in the context (if it is provided).
+
+        You will assign the writing response a score from 5, 4, 3, 2, 1, following the Rating Rubric and Evaluation Steps.
+        Give step-by-step explanations for your scoring, and only choose scores from 5, 4, 3, 2, 1.
+
+        ## Criteria Definition
+        Instruction following: The response demonstrates a clear understanding of the question answering task instructions, satisfying all of the instruction's requirements.
+        Groundedness: The response contains information included only in the context if the context is present in the user prompt. The response does not reference any outside information.
+        Completeness: The response completely answers the question with sufficient detail.
+        Fluent: The response is well-organized and easy to read.
+
+        ## Rating Rubric
+        5: (Very good). The answer follows instructions, is grounded, complete, and fluent.
+        4: (Good). The answer follows instructions, is grounded, complete, but is not very fluent.
+        3: (Ok). The answer mostly follows instructions, is grounded, answers the question partially and is not very fluent.
+        2: (Bad). The answer does not follow the instructions very well, is incomplete or not fully grounded.
+        1: (Very bad). The answer does not follow the instructions, is wrong and not grounded.
+
+        ## Evaluation Steps
+        STEP 1: Assess the response in aspects of instruction following, groundedness,completeness, and fluency according to the criteria.
+        STEP 2: Score based on the rubric.
+
+  question_answering_relevance: | 
+        You are an expert evaluator specializing in insurance-related queries. Your task is to evaluate the relevance of AI-generated responses to user questions.  We are assessing these responses for use in an insurance chatbot.
+        For each user question and AI response pair, engage in the following Chain-of-Thought process to determine the relevance score.  You will NOT be given any context documents or pre-defined "ground truth" answers. Your evaluation should be based on your insurance domain knowledge and common sense.**
+
+        # Chain-of-Thought Evaluation Process:
+        ## Think Step-by-Step and answer the following questions to arrive at a relevance score:**
+
+        Step 1: Understand the User's Core Intent:
+        What is the *fundamental question* the user is asking?  Rephrase the user's prompt in your own words to ensure you grasp the core information they are seeking.  *(e.g., If the prompt is "What is an insurance deductible?", the core intent is to understand the definition and purpose of a deductible.)*
+
+        Step 2: Initial Relevance Check - Does the AI Response *Attempt* to Answer the Question?
+        Quickly scan the AI response.  Does it seem to be addressing the *topic* of the user's question at all? Or does it appear to be completely unrelated? *(Yes/No - If No, proceed directly to Step 7 and assign a score of 1 or 2).*
+
+        Step 3: Directness of the Answer:
+        How directly does the AI response address the core question you identified in Step 1?  Does it provide a straightforward answer, or does it dance around the question without really answering it?  *(Consider: Is the answer immediately apparent, or do you have to infer it?)*
+
+        Step 4: Focus and Topicality:
+        Is the AI response focused on the specific question asked, or does it introduce irrelevant subtopics or go off on tangents?  Identify any parts of the response that are *not* directly related to answering the core question. *(List any extraneous elements if present.)*
+
+        Step 5: Insurance Domain Accuracy (Using Your Knowledge):
+        Based on your insurance expertise, is the information provided in the AI response generally accurate and sensible within the insurance domain?  Does it align with your understanding of insurance principles and concepts related to the question?  *(Note: You are *not* fact-checking against external sources, but using your internal knowledge.  Are there any parts that seem factually incorrect or nonsensical from an insurance perspective?)*
+
+        # Step 6: Completeness and Conciseness - Balanced Answer:
+        Does the response provide a reasonably complete answer to the core question, addressing the key aspects?  At the same time, is it concise and avoids unnecessary jargon or excessive detail that doesn't enhance the core answer? *(Consider: Does it give enough information to be helpful? Is it too verbose or too brief?)*
+
+        # Step 7: Assign Relevance Score (1-5) based on the above analysis:
+        Considering your answers to steps 1-6, and using the rubric below, assign a relevance score (5, 4, 3, 2, or 1).  Provide a *justification* for your score, explicitly referencing your observations from steps 2-6.  Explain *why* you chose that particular score, pointing out specific strengths and weaknesses of the AI response in relation to the user's question.
+
+        ## Rating Rubric:
+        5: (Very Relevant). The answer perfectly and directly addresses the question. It is highly focused, stays strictly on topic, concise, and accurate based on insurance domain knowledge.
+        4: (Relevant). The answer mostly addresses the question and is generally focused.  It might contain very minor extraneous details or could be slightly more direct, but overall it's a good and relevant answer.
+        3: (Somewhat Relevant). The answer partially addresses the question but may include some unrelated information, lack directness, or have minor inaccuracies from an insurance domain perspective. It is moderately focused.
+        2: (Barely Relevant). The answer only tangentially touches upon the question. It is largely off-topic, unfocused, lacks direct connection, and may contain significant inaccuracies or nonsensical insurance information.
+        1: (Not Relevant). The answer completely fails to address the question. It is entirely unrelated to the prompt and provides no useful or even tangentially related information.
+
+  question_answering_helpfulness: | 
+        You are an expert evaluator specializing in insurance-related queries. Your task is to evaluate the helpfulness of AI-generated responses to user questions.  
+        We are assessing these responses for use in an insurance chatbot, aiming to provide users with genuinely helpful information.
+
+        For each user question and AI response pair, engage in the following Chain-of-Thought process to determine the helpfulness score.  You will NOT be given any context documents or pre-defined "ground truth" answers. Your evaluation should be based on your insurance domain knowledge and common sense, focusing on how useful the response would be to a user seeking insurance information.
+
+        # Chain-of-Thought Evaluation Process:
+        ## Think Step-by-Step and answer the following questions to arrive at a helpfulness score:
+
+        Step 1: Understand the User's Underlying Goal:
+        Beyond the literal question, what is the user trying to achieve or understand? What is their likely intent or need behind asking this question in an insurance context?  (e.g., For "How much does car insurance cost?", the underlying goal might be to understand factors influencing cost and get a general idea of price ranges to budget or compare options.)
+
+        Step 2: Relevance Check - Is the Response Relevant to the Question?
+        First, confirm if the AI response is actually relevant to the user's question. Does it address the topic at all?  If it's not relevant, it cannot be helpful. (Yes/No - If No, proceed directly to Step 7 and likely assign a score of 1 or 2).
+
+        Step 3: Clarity and Understandability for a Layperson:
+        Is the AI response written in a clear, easy-to-understand manner for someone who may not be an insurance expert? Does it avoid excessive jargon or technical terms? Is the language accessible to a typical insurance customer? (Consider: Would a non-expert find this explanation easy to grasp?)
+
+        Step 4: Completeness for Practical Usefulness:
+        Does the response provide enough information to be practically helpful? Does it address the key aspects necessary to satisfy the user's underlying goal (identified in Step 1)?  Does it leave out crucial details that would limit its usefulness? (Consider: Does it give a full enough picture to be genuinely useful?)
+
+        Step 5: Actionability and Practical Value:
+        Does the response offer actionable information or insights that the user can actually use? Does it help them make a decision, understand their options, or take a next step related to their insurance needs? Is it practically valuable beyond just answering the question literally? (Consider:  Can the user do anything useful with this information?)
+
+        Step 6: Conciseness and Efficiency of Information Delivery:
+        Is the response concise and to the point, delivering the helpful information efficiently? Or is it overly verbose, rambling, or filled with unnecessary details that might obscure the key helpful points? (Consider: Is it easy to extract the useful information without wading through fluff?)
+
+        Step 7: Assign Helpfulness Score (1-5) based on the above analysis:
+        Considering your answers to steps 1-6, and using the rubric below, assign a helpfulness score (5, 4, 3, 2, or 1).  Provide a justification for your score, explicitly referencing your observations from steps 2-6.  Explain why you chose that particular score, pointing out specific strengths and weaknesses of the AI response in terms of its helpfulness to a user.
+
+        ## Rating Rubric:
+        5: (Very Helpful). The answer is exceptionally helpful. It perfectly addresses the question, is extremely clear and easy to understand, provides complete and actionable information, and is concisely delivered. It is highly valuable and user-centric.
+        4: (Helpful). The answer is generally helpful. It addresses the question well, is mostly clear, provides reasonably complete information, and offers some practical value. Minor improvements could be made in clarity, completeness, or conciseness.
+        3: (Somewhat Helpful). The answer is partially helpful. It addresses the question to some extent but may be unclear in parts, lack important details for practical use, or be somewhat verbose. Its helpfulness is moderate and limited.
+        2: (Barely Helpful). The answer is minimally helpful. It may be tangentially related to the question or provide very superficial information. It is likely unclear, incomplete, and offers little practical value to the user.
+        1: (Not Helpful). The answer is not at all helpful. It fails to address the question effectively, is irrelevant, unclear, or provides no useful information. It does not assist the user in any meaningful way.
+
+        ## Example - Let's assume you are evaluating a response to the following question:
+
+        Question: "What factors affect my car insurance premium?"
+        Answer: "Several factors influence your car insurance premium. These include your driving history (accidents, tickets), your age and gender (statistically, younger drivers and males are higher risk), the type of car you drive (expensive or high-performance cars cost more to insure), where you live (urban areas often have higher rates due to theft and accidents), your coverage choices (higher coverage levels increase premiums), and your credit score (in some states, a lower credit score can lead to higher premiums)."
+
+        ## Your Chain-of-Thought (Example):
+        Step 1: Underlying Goal:
+        User wants to understand why their car insurance premium is what it is and what factors they can potentially control or influence.
+
+        Step 2: Relevance Check:
+        Yes, the response directly addresses factors affecting car insurance premiums.
+
+        Step 3: Clarity and Understandability:
+        The response is clear and uses generally accessible language. No excessive jargon.
+
+        Step 4: Completeness for Practical Usefulness:
+        It provides a good range of key factors (driving history, age, car type, location, coverage, credit score).  It covers the major influences.
+
+        Step 5: Actionability and Practical Value:
+        Knowing these factors is helpful. Users can understand why their premium might be high and potentially take actions like improving their driving record or choosing a less expensive car in the future (though some factors are less controllable).
+
+        Step 6: Conciseness and Efficiency:
+        The response is reasonably concise and directly lists the factors without unnecessary fluff.
+
+        Step 7: Assign Helpfulness Score & Justification:
+        Score: (Helpful). Justification: The response is helpful because it clearly and understandably lists several key factors that influence car insurance premiums. It provides a reasonably complete overview and offers practical insights into what drives up costs, allowing users to better understand their premiums. It could be slightly more helpful with even more concrete examples or actionable tips for each factor, but it's already quite good.
+
+footer_prompts:    
+  custom_accuracy: |
+        Now it's your turn!
+        <Question>{instruction}</Question>
+        <Answer>{response}</Answer>
+        <ExpectedAnswer>{reference}</ExpectedAnswer>
+
+  custom_accuracy_no_reference: |
+        Now it's your turn!
+        <Question>{instruction}</Question>
+        <Answer>{response}</Answer>
+        <Context>{context}</Context>
+
+  question_answering_quality: |
+        Now it's your turn!
+        <Question>{instruction}</Question>
+        <Answer>{response}</Answer>
+
+  question_answering_relevance: | 
+        Now it's your turn!
+        <Question>{instruction}</Question>
+        <Answer>{response}</Answer>
+
+  question_answering_helpfulness: |
+        Now it's your turn!
+        <Question>{instruction}</Question>
+        <Answer>{response}</Answer>

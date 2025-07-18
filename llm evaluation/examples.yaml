@@ -1,0 +1,332 @@
+prompts:
+    custom_accuracy: |
+        <Examples>
+            <Example1>
+                <Question>Can my live-in partner be covered under my plan?</Question>
+                <Answer>The subscriber's plan does not cover dependents, so her partner will not be covered under her plan.</Answer>
+                <ExpectedAnswer>
+                If your relationship qualifies as a domestic partnership, they are covered. Domestic Partnership Qualifications:
+                - Not related by blood or a degree of closeness that would prohibit marriage in the law of the state in which they reside
+                - Not currently married to, or a domestic partner of, another person under either statutory or common law
+                - Share the same permanent residence and the common necessities of life
+                - At least 18 years of age
+                - Mentally competent to consent to contract
+                - Financially interdependent, and has furnished documents to support at least two of the following conditions of such financial interdependence:
+                - Joint ownership of an automobile
+                - Joint checking, bank, or investment account
+                - Joint credit account
+                - Lease for a residence identifying both partners as tenants
+                - Will and/or life insurance policies that designate the other as primary beneficiary.Additionally, this recognition applies to domestic partners of the same or opposite sex.
+                </ExpectedAnswer>
+                <Output>
+                {{
+                "correctness_score": "1",
+                "score_reasoning": "The AI Answer states the plan does not cover dependents and therefore the partner will not be covered. This directly contradicts the Expected Answer, which explicitly states that a live-in partner can be covered if the relationship qualifies as a domestic partnership and provides detailed qualifications for such coverage. The AI Answer is factually incorrect when compared to the Expected Answer.",
+                "correctness_category": "Coverage details are missing or incorrect"
+                }}
+                </Output>
+            </Example1>
+
+            <Example2>
+                <Question>My child was hit with a baseball and knocked out a permanent tooth. Will my insurance cover a replacement tooth?</Question>
+                <Answer>This plan does not offer coverage for general dental services, including crowns, unless as a result of accident or injury. For more information about dental benefits, the subscriber should call Aetna at 1-877-444-1012 or MetLife at 1-888-245-2920.</Answer>
+                <ExpectedAnswer>
+                Accidental Dental: Services include repairing or replacing teeth that were injured. Damage occurring from normal activities, daily living or extraordinary use are not covered. Member is required to contact a doctor or dentist within 72 hours of the accident and start treatment within 3 months of the accident or coverage start date. Treatment must be completed within 12 months of the accident or coverage start date.
+                INN: Primary Doctor: $20 copay; deductible does not apply.
+                Specialist: $75 copay; deductible does not apply
+                OON: 40 percent coinsurance after $2400 deductible per person, not exceeding $4800 for family. No prior authorization is required for INN or OON.
+                </ExpectedAnswer>
+                <Output>
+                {{
+                "correctness_score": "3",
+                "score_reasoning": "The AI Answer correctly states that coverage exists for dental services due to 'accident or injury,' which aligns with the Expected Answer's 'Accidental Dental' coverage. However, the AI Answer omits significant details provided in the Expected Answer, such as the definition of accidental dental ('repairing or replacing teeth that were injured'), the specific timeframes for seeking and completing treatment (72 hours, 3 months, 12 months), and all cost-sharing information (INN/OON copays, coinsurance, deductible applicability). These omissions are crucial conditions for understanding the coverage. The additional advice to call Aetna/MetLife is acceptable additional information. Due to the omission of crucial details from the Expected Answer, the AI answer is incomplete.",
+                "correctness_category": "Coverage details are missing or incorrect"
+                }}
+                </Output>
+            </Example2>
+
+            <Example3>
+                <Question>Do I need a referral to see a specialist?</Question>
+                <Answer>Yes, you will need a referral from your primary care physician to see a specialist.</Answer>
+                <ExpectedAnswer>
+                INN: Primary Doctor: $20 copay; deductible does not apply.
+                Specialist: $75 copay; deductible does not apply.
+                OON: 40 percent coinsurance after $2400 deductible per person, not exceeding $4800 for family. No prior authorization is required for INN or OON.
+                </ExpectedAnswer>
+                <Output>
+                {{
+                "correctness_score": "1",
+                "score_reasoning": "The AI Answer incorrectly states that a referral is required to see a specialist. The Expected Answer, while not explicitly stating 'no referral needed,' details that 'No prior authorization is required for INN or OON' and makes no mention of a referral requirement for specialists. The AI Answer's assertion of a referral requirement directly contradicts the information and implications of the Expected Answer.",
+                "correctness_category": "Pre-authorization or referral requirements are misrepresented"
+                }}
+                </Output>
+            </Example3>
+
+            <Example4>
+                <Question>What is the claim filing limit?</Question>
+                <Answer>The claim filing limit is 12 months from the date of service.</Answer>
+                <ExpectedAnswer>The member must submit a request for payment of benefits within 12 months from the date of service, or benefits may be denied or reduced, at our or the claim administrator's discretion.</ExpectedAnswer>
+                <Output>
+                {{
+                "correctness_score": "5",
+                "score_reasoning": "The AI Answer states the claim filing limit is '12 months from the date of service.' This aligns with the core information in the Expected Answer, which also specifies 'within 12 months from the date of service.' The Expected Answer includes additional details about potential consequences of late filing ('benefits may be denied or reduced...'), which is relevant context but not strictly part of the 'limit' itself. The AI Answer accurately captures the primary piece of information requested by the question and present in the Expected Answer. The omission of secondary details about consequences is minor in this context.",
+                "correctness_category": "Excellent - Complete and Accurate"
+                }}
+                </Output>
+            </Example4>
+
+            <Example5>
+                <Question>What is the coordination of benefits approach for other insurance?</Question>
+                <Answer>The coordination of benefits approach for other insurance is non-duplication of benefits with a $10,000 threshold.</Answer>
+                <ExpectedAnswer>Other Insurance: Non-Duplication of Benefit Approach Pay and Pursue with $10,000 threshold, except in states that have mandatory no-fault laws.</ExpectedAnswer>
+                <Output>
+                {{
+                "correctness_score": "5",
+                "score_reasoning": "The AI Answer identifies the coordination of benefits approach as 'non-duplication of benefits with a $10,000 threshold.' This aligns with the key components of the Expected Answer, which states 'Non-Duplication of Benefit Approach... with $10,000 threshold.' While the Expected Answer includes 'Pay and Pursue' and an exception for states with mandatory no-fault laws, the AI Answer accurately captures the main elements present in the Expected Answer. The omissions are minor and do not detract from the core accuracy of the stated approach and threshold.",
+                "correctness_category": "Excellent - Complete and Accurate"
+                }}
+                </Output>
+            </Example5>
+
+            <Example6>
+                <Question>What does INN and OON mean in terms of coverage?</Question>
+                <Answer>INN stands for In-Network and OON stands for Out-of-Network. These terms refer to the providers and facilities that are covered by your insurance plan.</Answer>
+                <ExpectedAnswer>
+                INN: In-Network coverage refers to medical services obtained from providers and facilities within the network that have contracted with your insurance plan. These providers and facilities have agreed to provide services at discounted rates negotiated by the insurance plan.
+                OON: Out-of-Network coverage refers to medical services obtained from providers and facilities outside the network. These providers and facilities have not contracted with your insurance plan and may result in higher out-of-pocket costs for you.
+                </ExpectedAnswer>
+                <Output>
+                {{
+                "correctness_score": "3",
+                "score_reasoning": "The AI Answer correctly defines INN as In-Network and OON as Out-of-Network, and states these refer to covered providers/facilities. This captures a basic part of the Expected Answer. However, the Expected Answer provides significantly more detail on what these terms mean *in terms of coverage*, such as the contractual relationships, discounted rates for INN, and potential for higher out-of-pocket costs for OON. The AI Answer lacks this crucial explanatory depth present in the Expected Answer, making it incomplete regarding the 'terms of coverage' aspect of the question.",
+                "correctness_category": "Coverage details are missing or incorrect"
+                }}
+                </Output>
+            </Example6>
+
+            <Example7>
+                <Question>Are pre-existing conditions covered under this plan?</Question>
+                <Answer>Yes, pre-existing conditions are covered under this plan.</Answer>
+                <ExpectedAnswer>Pre-Existing Conditions: Yes</ExpectedAnswer>
+                <Output>
+                {{
+                "correctness_score": "5",
+                "score_reasoning": "The AI Answer states 'Yes, pre-existing conditions are covered under this plan.' The Expected Answer is 'Pre-Existing Conditions: Yes'. The AI Answer accurately and completely reflects the information in the Expected Answer, providing a slightly more conversational but equally correct response.",
+                "correctness_category": "Excellent - Complete and Accurate"
+                }}
+                </Output>
+            </Example7>
+
+            <Example8>
+                <Question>Can I connect existing health care devices to track my progress?</Question>
+                <Answer>Yes, you can connect existing health care devices such as a scale, blood pressure cuff, or blood glucose meter to help track your progress.</Answer>
+                <ExpectedAnswer>Connect existing health care devices such as a scale, blood pressure cuff, or blood glucose meter to help track progress toward health goals.</ExpectedAnswer>
+                <Output>
+                {{
+                "correctness_score": "5",
+                "score_reasoning": "The AI Answer states 'Yes, you can connect existing health care devices such as a scale, blood pressure cuff, or blood glucose meter to help track your progress.' The Expected Answer is 'Connect existing health care devices such as a scale, blood pressure cuff, or blood glucose meter to help track progress toward health goals.' The AI Answer accurately and completely reflects the information in the Expected Answer, including the affirmative confirmation and the examples of devices.",
+                "correctness_category": "Excellent - Complete and Accurate"
+                }}
+                </Output>
+            </Example8>
+
+            <Example9>
+                <Question>What is the coverage for mental health services?</Question>
+                <Answer>Mental health services are covered under this plan. Please refer to the plan documents for specific details and coverage limitations.</Answer>
+                <ExpectedAnswer>Mental health services are covered under this plan. Coverage details and limitations can be found in the plan documents.</ExpectedAnswer>
+                <Output>
+                {{
+                "correctness_score": "5",
+                "score_reasoning": "The AI Answer states 'Mental health services are covered under this plan. Please refer to the plan documents for specific details and coverage limitations.' The Expected Answer is 'Mental health services are covered under this plan. Coverage details and limitations can be found in the plan documents.' The AI Answer is an almost identical paraphrase of the Expected Answer and accurately conveys all its information. The instruction to refer to plan documents is acceptable additional information.",
+                "correctness_category": "Excellent - Complete and Accurate"
+                }}
+                </Output>
+            </Example9>
+
+            <Example10>
+                <Question>What is the cost-sharing for prescription medications?</Question>
+                <Answer>The cost-sharing for prescription medications varies depending on the drug tier. Please refer to the plan formulary or contact the pharmacy benefit manager for specific information.</Answer>
+                <ExpectedAnswer>The cost-sharing for prescription medications varies depending on the drug tier. Please refer to the plan formulary or contact the pharmacy benefit manager for specific information on copayments or coinsurance amounts.</ExpectedAnswer>
+                <Output>
+                {{
+                "correctness_score": "5",
+                "score_reasoning": "The AI Answer states 'The cost-sharing for prescription medications varies depending on the drug tier. Please refer to the plan formulary or contact the pharmacy benefit manager for specific information.' The Expected Answer is very similar but adds 'on copayments or coinsurance amounts.' The AI Answer accurately captures the core information that cost-sharing varies by tier and where to find specifics. The omission of the examples 'copayments or coinsurance amounts' is minor, as 'specific information' would encompass this. The answer aligns well with the Expected Answer.",
+                "correctness_category": "Excellent - Complete and Accurate"
+                }}
+                </Output>
+            </Example10>
+
+            <Example11>
+                <Question>Does student coverage end after college graduation?</Question>
+                <Answer>A student is covered until the last day of the month during which the student reaches age 26.</Answer>
+                <ExpectedAnswer>A dependent student is covered until the last day of the month following the date the student reaches age 26. </ExpectedAnswer>
+                <Output>
+                {{
+                "correctness_score": "3",
+                "score_reasoning": "The AI Answer correctly addresses the core intent of the question by indicating that student coverage termination is based on reaching age 26, not directly on college graduation, and that it ends on the last day of the month. This aligns partially with the Expected Answer. However, the AI Answer states coverage ends 'the last day of the month *during which* the student reaches age 26,' whereas the Expected Answer specifies 'the last day of the month *following* the date the student reaches age 26.' This constitutes a factual inaccuracy regarding the specific month of coverage termination. Because the Answer provides an incorrect timeline by one month compared to the Expected Answer, it is only partially accurate and warrants a score of 3.",
+                "correctness_category": "Coverage details are missing or incorrect"
+                }}
+                </Output>
+            </Example11>
+
+            <Example12>
+                <Question>Is there a copay for a routine colonoscopy?</Question>
+                <Answer>
+                For a routine (preventive) colonoscopy:
+                INN: There is no charge, and the annual deductible does not apply.
+                OON: Benefits are not covered.
+                </Answer>
+                <ExpectedAnswer>Member cost-sharing for preventive colonoscopy is waived when all of the following apply: 
+                â€¢ The patient's age is 45-75 years (ends on 76th birthday) as recommended by the USPSTF; 
+                â€¢ The provider is participating in the network; 
+                â€¢ When billed in accordance with the coding in the Colorectal Cancer Screening row listed in the Preventive Care Services medical policy.
+                </ExpectedAnswer>
+                <Output>
+                {{
+                "correctness_score": "3",
+                "score_reasoning": "The AI Answer correctly states that for an INN routine colonoscopy there is no charge and the deductible is waived, aligning with the core of the ExpectedAnswer. However, the ExpectedAnswer provides critical conditions for this waiver (patient age 45-75, INN provider, specific billing requirements). The AI Answer omits these crucial qualifying conditions. While the core intent regarding no charge for INN is partially conveyed, the omission of these necessary conditions makes the answer incomplete and potentially misleading if a member doesn't meet all criteria. Therefore, it's moderately accurate.",
+                "correctness_category": "Coverage details are missing or incorrect"
+                }}
+                </Output>
+            </Example12>
+
+            <Example13>
+                <Question>Does my medical plan offer coverage for glasses?</Question>
+                <Answer>The medical plan generally covers vision services like eye exams to check eye health and identify vision problems. However, it typically does not cover glasses or contact lenses, including fitting charges. For more details about vision benefits, MetLife administers vision benefits. You can visit their website at www.metlife.com/mybenefits or call 855-638-3931.</Answer>
+                <ExpectedAnswer>This plan does not offer coverage for glasses. Your vision benefits are administered by MetLife. For more information about these benefits, call 855-638-3931 or visit www.metlife.com/mybenefits.</ExpectedAnswer>
+                <Output>
+                {{
+                "correctness_score": "5",
+                "score_reasoning": "The AI Answer correctly states the plan does not cover glasses and that MetLife administers vision benefits, including contact details, all of which align perfectly with the ExpectedAnswer. The additional information about the medical plan generally covering eye exams is accurate, relevant context about vision services, and does not contradict the ExpectedAnswer's focus on glasses. It enhances the user's understanding of vision-related coverage. All key information from ExpectedAnswer is present and correct.",
+                "correctness_category": "Excellent - Complete and Accurate"
+                }}
+                </Output>
+            </Example13>
+
+            <Example14>
+                <Question>Is massage therapy covered?</Question>
+                <Answer>Massage therapy is not covered under this plan, as it falls under the category of alternative treatments. Other alternative treatments not covered include: Acupressure, Aromatherapy, Art/Dance/Music therapy, Animal-assisted therapy, Hypnotism, Rolfing, Adventure-based/Wilderness/Outdoor therapy.</Answer>
+                <ExpectedAnswer>Massage therapy is not covered under this plan. We do not pay benefits for exclusions, even if: It is recommended or prescribed by a doctor; It is the only available treatment for your condition.</ExpectedAnswer>
+                <Output>
+                {{
+                "correctness_score": "5",
+                "score_reasoning": "The AI Answer correctly states that massage therapy is not covered, which is the core factual point of the ExpectedAnswer. While the AI Answer provides a reason ('alternative treatments') and lists examples not explicitly in the ExpectedAnswer (which focuses on the nature of exclusions), this reasoning is plausible within the healthcare insurance domain and does not contradict the fundamental fact of non-coverage. The additional list of alternative treatments is relevant context. The core message aligns perfectly.",
+                "correctness_category": "Excellent - Complete and Accurate"
+                }}
+                </Output>
+            </Example14>
+
+            <Example15>
+                <Question>Is there coverage for dogs through the health plan?</Question>
+                <Answer>There is no coverage for dogs through this health plan. UnitedHealthcare does not offer pet insurance.</Answer>
+                <ExpectedAnswer>The health plan only provides benefits for eligible, covered expenses for humans, no coverage for Figo Pet Insurance is available with UnitedHealthcare. However, the plan does offer a partnership with Figo Pet Insurance. For more information about Figo Pet Insurance, please call the phone number on your health plan ID card.</ExpectedAnswer>
+                <Output>
+                {{
+                "correctness_score": "1",
+                "score_reasoning": "The AI Answer correctly states the health plan itself doesn't cover dogs. However, it incorrectly and misleadingly states 'UnitedHealthcare does not offer pet insurance' without mentioning the Figo Pet Insurance partnership detailed in the ExpectedAnswer. This omission is significant because the ExpectedAnswer clarifies a related offering exists via a partnership, which directly addresses the broader intent of the user's query about pet-related insurance options through UHC. The AI Answer is therefore inaccurate and misleading by omitting this key piece of information from the ExpectedAnswer.",
+                "correctness_category": "Coverage details are missing or incorrect"
+                }}
+                </Output>
+            </Example15>
+        </Examples>
+
+    custom_accuracy_no_reference: |
+        <Examples>
+            <Example1>
+                <Question>Can my live-in partner be covered under my plan?</Question>
+                <Answer>The subscriber's plan does not cover dependents, so her partner will not be covered under her plan.</Answer>
+                <Context>
+                Pre-Existing ConditionsYesCare Management**Personal Health Support (PHS):** United HealthCare Personal Health Support (PHS) disease management is a telephonic program and participants may be assigned a designated PHS nurse or team. After reaching the member, PHS will provide their direct phone number to the member. If the member is returning a call or has lost their phone number, please warm transfer using VCC redirect to Optum CIDM program. The PHS nurse may invite members to enroll in the PHS digital capabilities. Once enrolled, members will be able to: * Participate in Living with Diabetes, an 8-week virtual diabetes program with small group participation and self-help tools.* Message their nurse in a secure website or mobile device.* Schedule appointments with their nurse to create a health action plan.* Connect existing health care devices such as a scale, blood pressure cuff or blood glucose meter to help track progress toward health goals.Claim Filing LimitThe member must submit a request for payment of benefits within **12 months from date of service** or benefits may be denied or reduced, at our or the claim administrator's discretion. This time limit does not apply if the member is legally incapacitated. If the claim relates to an inpatient stay, the date of service is the date the inpatient stay ends.Cobra InformationProvided by: Global HR Service Center Call **1-800-556-6044** **Are individual medical conversions allowed?** NoCoordination of BenefitsOther Insurance: Non-Duplication of Benefit Approach Pay and Pursue with **$10,000** threshold,except in states that have mandatory no-fault laws. **For secondary COB situations, does this customer follow the NAIC guideline to cover all non-covered benefits allowed by the primary carrier?** No Medicare: Non-Duplication of Benefits Approach (Med 5) **What does come out whole mean?** If UHC is not primary, benefits may be reduced so that the total benefits paid are not more than the total allowable expense. **What does non duplication mean?** If UHC is not primary, we will not pay any benefits if the primary plan paid the same or more than what UHC allows. **Why have my claims been stopped for COB information, when other claims have already been processed**? Members are required to give additional insurance information on an annual basis. It is important for you to keep this information updated. If you have not provided this information, we may pend a claim until the information is received.
+                </Context>
+                <Output>
+                {{
+                "score_reasoning": "The score is 1 because the provided context contains no information whatsoever about dependent eligibility, domestic partnerships, or coverage for live-in partners. The AI answer makes a definitive statement ('does not cover dependents') that cannot be verified or refuted using the context. Since the answer is entirely unsupported by the sole source of truth (the context), it fails the evaluation criteria.",
+                "correctness_score": "1"
+                }}
+                </Output>
+            </Example1>
+
+            <Example2>
+                <Question>My child was hit with a baseball and knocked out a permanent tooth. Will my insurance cover a replacement tooth?</Question>
+                <Answer>This plan does not offer coverage for general dental services, including crowns, unless as a result of accident or injury. For more information about dental benefits, the subscriber should call Aetna at 1-877-444-1012 or MetLife at 1-888-245-2920.</Answer>
+                <Context>
+                Special Services > Dental Services - Accident Only: \nYour cost if you use Network benefits\nUHC Network\nPrimary Doctor:\n$20 copay\nThe annual deductible does not apply.\nSpecialist:\n$75 copay\nThe annual deductible does not apply.\nYou do not need to get prior authorization before getting this care.\nYour doctor will get prior authorization if needed.\n Your cost if you use Out-of-Network benefits\n40% co-insurance\n After you pay the deductible.\nYou do not need to get prior authorization before getting this care.\nWhat are accidental dental services?\nRepair or replacement of sound natural or restored teeth due to injury.\nRequirements:\nYou must contact a doctor or dentist within 72 hours of the accident.\nTreatment must start within:\n3 months of the accident or\n3 months from the time you are covered on the plan.\nTreatment must be completed within:\n12 months of the accident or\n12 months from the time you are covered on the plan\nWe cover:\nEmergency examination\nDiagnostic x-rays\nRoot canal and related services\nTemporary splinting of teeth\nSimple minimal restorative procedures (fillings)\nExtractions\nPost-traumatic crowns if they are the only treatment available\nReplacement of lost teeth\nLimits & Exceptions :\nGeneral:\nNo coverage for:\nDamage that occurs as a result of normal activities, daily living or extraordinary use\nDental care that is required to treat the effects of a medical condition
+                </Context>
+                <Output>
+                {{
+                "score_reasoning": "The score is 3 because the answer is only partially complete based on the context. It correctly identifies that coverage exists only for accidents ('unless as a result of accident or injury'), aligning with the 'Dental Services - Accident Only' section. However, it omits numerous critical details required by the Domain Instructions that *are* present in the context, such as the specific INN ($20/$75 copay, no deductible) and OON (40% after deductible) benefits, the definition of covered accidental services ('Repair or replacement... due to injury'), and the mandatory requirements (contact within 72 hours, start/complete treatment timelines). This lack of contextual completeness justifies the moderate score.",
+                "correctness_score": "3"
+                }}
+                </Output>
+            </Example2>
+
+            <Example3>
+                <Question>Do I have a copay for my annual wellness exam?</Question>
+                <Answer>Since the member is 60 years old, the annual wellness exam is considered a preventive benefit and therefore there is no copay for INN services. The annual deductible does not apply. However, if the member uses OON services, they will be responsible for 40% coinsurance after the deductible of $2400 for each covered person not to exceed $4800 for all covered persons in the family. Any amount paid towards the deductible will apply to both INN and OON deductible.</Answer>
+                <Context>
+                Preventive Care Services\n Your cost if you use Network benefits\nUHC Network\nNo Charge\nThe annual deductible does not apply.\nYou do not need to get prior authorization before getting this care.\nYour doctor will get prior authorization if needed.\nOut of Network\n40% coinsurance\nAfter you pay the deductible.\n\nLimits & Exceptions :\nGeneral:\nYou may have to pay a copay, deductible, or coinsurance if you receive non-preventive services during your preventive visit or you receive services from an out-of-network provider.\n\nThe Plan covers charges for two routine physical exams per calendar year for all members over age 18.\n\nWell Man:\n\nPlan covers 1 PSA screening as preventive per calendar year for males age 40 & over.
+                </Context>
+                <Output>
+                {{
+                "score_reasoning": "The score is 5 because the answer accurately reflects the context regarding preventive care cost-sharing. It correctly states there is 'No Charge' (interpreted as no copay and deductible does not apply) for INN preventive services and correctly describes the OON benefit as '40% coinsurance After you pay the deductible', both matching the context. While the answer includes specific deductible amounts ($2400/$4800) not present in this snippet, the core information about copay absence (INN) and OON cost-sharing directly answers the question accurately based on the provided context.",
+                "correctness_score": "5"
+                }}
+                </Output>
+            </Example3>
+
+            <Example4>
+                <Question>Now that I've lost my employment, will my dependents be covered under COBRA?</Question>
+                <Answer>The subscriber's dependents will be covered under COBRA for 36 months if the subscriber's employment is terminated. The subscriber may choose to continue only medical coverage under COBRA, even if they had medical and dental coverage while active. The subscriber can contact the Global HR Service Center at 1-800-556-6044 for more information.</Answer>
+                <Context>
+                COBRA is a federal law that requires employers with 20 or more employees to offer continued group coverage to employees and the employee's dependents for a time after they leave the group health plan under certain conditions (qualifying events). These conditions will determine the period of coverage (continuation of coverage).
+                Qualifying Events and Coverage Periods
+                Termination (other than by reason of such employee's gross misconduct) of the covered employee's employment - 18 months
+                Reduction of hours of the covered employee's employment - 18 months
+                For coverage employees who are retirees of the employer, the employer's bankruptcy under Title 11 of the United States Code - 36 months for spouse and child
+                Death of the covered employee - 36 months for spouse and child
+                Divorce or legal separation of the covered employee from the employee's spouse - 36 months for spouse and child
+                Dependent child no longer meets plan's definition of dependent - 36 months for child
+                Enrollment Period
+                Once a qualifying event has occurred, the COBRA-eligible individuals have 60 days from the latest of one of the following:
+                Date of qualifying event
+                Date qualified beneficiary would lose coverage
+                Date qualified beneficiary is informed of the beneficiary's obligation to provide notice to elect to continue the coverage
+                No lapse in coverage can occur. Coverage will be retroactive to the date of the qualifying event or loss of coverage date (date benefits terminate).
+                Note:
+                The employee may choose to just provide COBRA continuation to dependents if the dependents were covered while the employee was active.
+                If the employee had medical and dental coverage while active, the employee can choose to continue only medical coverage under COBRA.
+                </Context>
+                <Output>
+                {{
+                "score_reasoning": "The score is 1 because the answer contains a significant factual error directly contradicted by the context. The answer states dependents are covered for '36 months' upon employment termination, but the context explicitly lists the coverage period for 'Termination... of the covered employee's employment' as '18 months'. This direct contradiction of a key detail makes the answer incorrect.",
+                "correctness_score": "1"
+                }}
+                </Output>
+            </Example4>
+
+            <Example5>
+                <Question>Check if neonatal resource services and mammogram services are covered under the plan</Question>
+                <Answer>Neonatal Resource Services (NRS) are covered under the plan. If the member has a baby in the Neonatal Intensive Care Unit (NICU), nurses will be available to answer questions about the baby's care in the NICU and when the member brings the baby home. For more information, the member can call toll-free at 1-888-936-7246. TTY users can dial 711.
+                Mammograms are covered under the plan. Mammograms are tests using x-ray images to see if there is an abnormality in the breast tissue. A mammogram can be done for preventive or diagnostic reasons.
+                **INN benefits:**
+                * UHC Network - No Charge. The annual deductible does not apply. The member does not need to get prior authorization before getting this care. The doctor will get prior authorization if needed.
+                **OON benefits:**
+                * Benefits are not covered.
+                **Limits and Exceptions:**
+                * Mammogram is covered with no age or frequency limits.
+                </Answer>
+                <Context>
+                Neonatal Resource Services (NRS) are covered. If you have a baby in the Neonatal Intensive Care Unit (NICU), nurses will be available to answer questions about your baby's care in the NICU and when you bring your baby home. For more information call toll-free at 1-888-936-7246. TTY users can dial 711.
+                Mammograms and other Breast Imaging - Diagnostic**What are diagnostic images?** Diagnostic images are tests using images to look for breast cancer or disease. Examples of diagnostic images are: * Digital mammography* 3D mammograms Your benefits include coverage for: * The facility* Supplies* Equipment* Services for anesthesiologists, pathologists and radiologists* Genetic testing For more information about other doctor fees, see *Physician Fees for Surgical and Medical Services* benefit section. A mammogram can be done for preventive or diagnostic reasons. **What is the difference between preventive and diagnostic?** Preventive care often includes screenings, check-ups, and patient counseling to prevent or discover illness, disease, or other health problems. Diagnostic services are given when you had an abnormal screening or have symptoms that require further diagnosis. When you get a mammogram, other diagnostic services may be provided, such as a breast MRI or ultrasound.
+                For information about preventive mammograms, see *Mammograms (Breast Imaging) - Preventive* benefit section.For more information about breast MRI, see *Major Diagnostic and Imaging - Outpatient* benefit section. For more information about diagnostic breast ultrasounds, see *Minor Lab, X-Ray and Diagnostic - Outpatient* benefit section. **Need help understanding health care terms?** View the **[glossary](http://glossary.justplainclear.com/)** for definitions.Type: INNYour cost if you use Network benefits**Preferred Tier 1: Free-Standing, Independent Radiology Facility** **10%** co-insurance After you pay the deductible **Non-Preferred Tier 2: Non-Free-Standing Radiology Center (i.e. Hospital or Hospital-affiliated)** **30%** co-insurance After you pay the deductible **You do not need to get prior authorization before getting this care.** **Your doctor will get prior authorization if needed.**Type: OONYour cost if you use Out-of-Network benefits**40%** coinsurance
+                After you pay the deductible. **You must get prior authorization for genetic testing.** Please submit the request at least 5 business days before the appointment. **$500.00** penalty if you don't get prior authorizationLimits and Exceptions: You may have to pay an additional copay, deductible, or coinsurance for services provided in a doctor's office. No coverage for: * Automated breast ultrasound* Computer-aided detection (CAD)* Computer-aided tactile breast imaging* Electrical impedance scanning (EIS)* Magnetic resonance elastography (MRE)* Scintimammography Mammogram is covered with no age or frequency limits.Physician Fees for Surgical and Medical Services**What are physician fees?** Doctor fees in a hospital, skilled nursing facility, inpatient rehabilitation facility, alternate facility or house calls. **Need help understanding health care terms?** View the **[glossary](http://glossary.justplainclear.com/)** for definitions.Type: INNYour cost if you use Network benefits
+                **UHC Network** **10%** co-insurance After you pay the deductible. **You do not need to get prior authorization before getting this care.** **Your doctor will get prior authorization if needed.**Type: OONYour cost if you use Out-of-Network benefits**40%** co-insurance After you pay the deductible. **You do not need to get prior authorization before getting this care.**Limits and Exceptions: If the service is provided in a doctor's office, additional copay, deductible or coinsurance may apply.
+                </Context>
+                <Output>
+                {{
+                "score_reasoning": "The score is 3 because the answer is incomplete regarding mammogram coverage based on the provided context and domain instructions. While it correctly covers Neonatal Resource Services and states mammograms are covered for preventive/diagnostic reasons, it only provides cost details seemingly for preventive ('No Charge' INN, OON 'Not covered'). The context clearly outlines different, tiered INN costs (10%/30% coinsurance after deductible) and OON costs (40% coinsurance after deductible) specifically for *diagnostic* mammograms. Since the question was general and the context provides details for both preventive (implied by other sections) and diagnostic, the answer should have included the diagnostic details according to the Domain Instructions, but failed to do so.",
+                "correctness_score": "3"
+                }}
+                </Output>
+            </Example5>
+        </Examples>
